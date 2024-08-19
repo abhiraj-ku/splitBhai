@@ -1,0 +1,113 @@
+/* Reset and Fonts */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background-color: #f0f2f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    color: #333;
+}
+
+.container {
+    background: #ffffff;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    width: 400px;
+    max-width: 100%;
+}
+
+.form-container {
+    padding: 30px;
+}
+
+.form-header h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+}
+
+.form-header p {
+    font-size: 14px;
+    color: #777;
+    margin-bottom: 20px;
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #555;
+}
+
+.input-group input[type="text"],
+.input-group input[type="email"],
+.input-group input[type="password"],
+.input-group input[type="tel"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.input-group input[type="text"]:focus,
+.input-group input[type="email"]:focus,
+.input-group input[type="password"]:focus,
+.input-group input[type="tel"]:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+.input-group button {
+    width: 100%;
+    padding: 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.3s ease;
+}
+
+.input-group button:hover {
+    background-color: #0056b3;
+}
+
+.totp-button.secondary {
+    background-color: #6c757d;
+}
+
+.totp-button.secondary:hover {
+    background-color: #5a6268;
+}
+
+.additional-options {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.additional-options p {
+    color: #555;
+    font-size: 14px;
+}
+
+.totp-info {
+    font-size: 12px;
+    color: #777;
+    margin-top: 8px;
+    text-align: left;
+}
