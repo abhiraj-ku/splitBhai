@@ -13,6 +13,7 @@ client.on("on", () => {
 
 // connect and handle the promise
 
+//todo: add logic for queue and cron job
 client
   .connect()
   .then(() => {
