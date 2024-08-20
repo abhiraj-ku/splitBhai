@@ -28,5 +28,4 @@ async function importDomain() {
     mongoose.connection.close();
   }
 }
-
 module.exports = importDomain;

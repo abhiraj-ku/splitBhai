@@ -18,6 +18,8 @@
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.5.3",
+    "morgan": "^1.10.0",
+    "redis": "^4.7.0",
     "speakeasy": "^2.0.0"
   },
   "devDependencies": {
