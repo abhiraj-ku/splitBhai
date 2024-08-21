@@ -8,14 +8,14 @@ const { db } = require("./utils/disposableEmailModels");
 var morgan = require("morgan");
 
 // call the db connection url
-connectDB(1, 1000)
-  .then(() => {
-    console.log(`connecting....`);
-  })
-  .catch((error) => {
-    console.error(`Failed to connect to MongoDB after multiple reconnects `);
-    process.exit(1);
-  });
+// connectDB();
+// .then(() => {
+//   console.log(`connecting....`);
+// })
+// .catch((error) => {
+//   console.error(`Failed to connect to MongoDB after multiple reconnects `);
+//   process.exit(1);
+// });
 
 // Middleware to parse json and urlEncoded
 app.use(express.urlencoded({ extended: true }));
@@ -24,11 +24,18 @@ app.use(express.json());
 // HTTP request logger middleware
 app.use(morgan("tiny"));
 
+//sample route to test the server
+app.get("/home", (req, res) => {
+  res.status(200).json({
+    message: "hello visitor !",
+  });
+});
+
 // user route
 const userRoute = require("./routes/userRoute");
 
 // user route middleware
-app.use("/u/new", userRoute);
+app.use("/user/new", userRoute);
 
 const server = app.listen(PORT, () => {
   console.log(`server is running on the port: ${PORT}`);

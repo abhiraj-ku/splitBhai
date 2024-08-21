@@ -1,0 +1,108 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QR Code</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f0f0f0;
+      font-family: Arial, sans-serif;
+    }
+    .container {
+      text-align: center;
+      background: #fff;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    img {
+      width: 300px; /* Adjust width as needed */
+      height: 300px; /* Adjust height as needed */
+    }
+    h1 {
+      font-size: 24px;
+      color: #333;
+    }
+    input {
+      margin-top: 20px;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      width: 80%;
+      max-width: 400px;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      color: #fff;
+      background-color: #007bff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .message {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #d9534f;
+    }
+    .message.success {
+      color: #5bc0de;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Scan this QR code with Google Authenticator or any TOTP app:</h1>
+    <img src="data:image/png;base64,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" alt="QR Code">
+    <input type="text" id="otpInput" placeholder="Enter your OTP">
+    <button onclick="verifyOTP()">Verify OTP</button>
+    <div id="message" class="message"></div>
+  </div>
+  <script>
+    function verifyOTP() {
+      const secret = "NRKXGZLDLNLWKRLEIEYHUUSNMV4XE7LE";
+      const userProvidedCode = document.getElementById("otpInput").value;
+      
+      // Send request to server for OTP verification (replace this with actual server request)
+      fetch('/verify', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ secret, token: userProvidedCode })
+      })
+      .then(response => response.json())
+      .then(data => {
+        const messageElement = document.getElementById("message");
+        if (data.success) {
+          messageElement.textContent = "Code verified successfully!";
+          messageElement.className = "message success";
+        } else {
+          messageElement.textContent = "Incorrect code. Try again.";
+          messageElement.className = "message";
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        const messageElement = document.getElementById("message");
+        messageElement.textContent = "An error occurred. Please try again.";
+        messageElement.className = "message";
+      });
+    }
+  </script>
+</body>
+</html>
+    

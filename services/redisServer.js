@@ -1,4 +1,5 @@
 const { createClient } = require("redis");
+const wildcards = require("disposable-email-domains/wildcard.json");
 
 const client = createClient({});
 
