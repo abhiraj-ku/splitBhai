@@ -8,29 +8,28 @@ client.on("error", () => {
   console.log(`Redis client Error:`, error);
 });
 
-client.on("on", () => {
-  console.log(`Closing the redis instance`);
+client.on("connect", () => {
+  console.log(`Redis client connected....`);
+});
+
+client.on("end", () => {
+  console.log(`Redis client Disconnected...`);
 });
 
 // connect and handle the promise
 
-//todo: add logic for queue and cron job
 client
   .connect()
   .then(() => {
-    // set the key-value to redis server
-    client.set("ab", 56);
-  })
-  .then(() => {
-    // get the value of key "ab"
-    return client.get("ab");
-  })
-  .then((value) => {
-    console.log(`Value of ab:`, value);
+    console.log(`Redis client connection success`);
   })
   .catch((err) => {
     console.error(`Redis client error:`, err);
-  })
-  .finally(() => {
-    client.quit();
   });
+
+process.on("SIGINT", () => {
+  console.log(`Closing the client gracefully`);
+  client.quit();
+});
+
+module.exports = client;
