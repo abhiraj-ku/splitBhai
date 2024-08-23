@@ -1,7 +1,11 @@
 const { promisify } = require("util");
 const crypto = require("crypto");
+const fs = require("fs");
+const path = require("path");
 const redisClient = require("./redisServer");
 const nodemailer = require("nodemailer");
+const { rejects } = require("assert");
+const { error } = require("console");
 
 // promisify Redis function for avoiding callback hell
 const setAsync = promisify(redisClient.set).bind(redisClient);
@@ -43,6 +47,29 @@ async function storeuser(name, email) {
   return verificationCode;
 }
 
+// function to read the html template
+
+function emailTemplate(verificationCode) {
+  return new Promise((resolve, reject) => {
+    fs.readFile(
+      path.join(__dirname, "verification-email-template.html"),
+      "utf8",
+      (err, data) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        // Replace placeholders with actual values
+        const year = new Date().getFullYear();
+        const html = data
+          .replace("{{verificationCode}}", verificationCode)
+          .replace("{{year}}", year);
+        resolve(html);
+      }
+    );
+  });
+}
+
 // function to send verification code
 async function sendVerificationCode(email) {
   const userData = await getAsync(email);
@@ -63,10 +90,10 @@ async function sendVerificationCode(email) {
   });
 
   const mailOptions = {
-    from: "Your Name <your-email@yourdomain.com>",
+    from: "mail@abhikumar.site",
     to: email,
     subject: "Your Verification Code",
-    text: `Your verification code is: ${verificationCode}`,
+    text: html,
   };
 
   await transporter.sendMail(mailOptions);

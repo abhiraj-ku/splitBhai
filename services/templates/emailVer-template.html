@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+            max-width: 600px;
+            padding: 20px;
+            text-align: left;
+        }
+
+        h1 {
+            color: #333333;
+        }
+
+        p {
+            color: #666666;
+            line-height: 1.6;
+        }
+
+        .code {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4CAF50;
+            border: 2px solid #4CAF50;
+            border-radius: 4px;
+            padding: 10px;
+            display: inline-block;
+        }
+
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #999999;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1><span style="text-decoration: underline; color: #4CAF50;" >splitBhai</span> - your expense splitter & much more</h1>
+        <h3>Verification Code</h3>
+        <p>Hi there,</p>
+        <p>We received a request to verify your email address. Please use the following verification code to complete
+            the process:</p>
+        <p class="code">{{verificationCode}}</p>
+        <p>If you did not request this verification code, please ignore this email.</p>
+        <p>Thank you!</p>
+        <div class="footer">
+            <p>&copy; {{year}} Your Company. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+
+</html>
