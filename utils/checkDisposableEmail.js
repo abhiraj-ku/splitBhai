@@ -1,31 +1,24 @@
-const mongoose = require("mongoose");
-const disposableEmailModel = require("./disposableEmailModels");
-const wildcards = require("disposable-email-domains/wildcard.json");
+const axios = require("axios");
 
-async function importDomain() {
+// function to verify disposable and valid email
+const verifyEmail = async (email) => {
+  const options = {
+    method: "GET",
+    url: "https://disposable-invalid-email-verifier.p.rapidapi.com/domain/email",
+    params: { email },
+    headers: {
+      "x-rapidapi-key": process.env.RAPID_API_KEY,
+      "x-rapidapi-host": "disposable-invalid-email-verifier.p.rapidapi.com",
+    },
+  };
+
   try {
-    await mongoose.connect("mongodb://localhost:27017/disposabledomain", {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-
-    console.log("Connected to MongoDB");
-
-    // wildcards json array ko loop kro and done
-    for (let domain of wildcards) {
-      try {
-        await disposableEmailModel.create({ domain });
-        console.log(`Imported: ${domain}`);
-      } catch (error) {
-        console.error(`Error importing ${domain}:`, error);
-      }
-    }
-
-    console.log("All domains imported successfully!");
+    const request = await axios.request(options);
+    console.log(request.data);
   } catch (error) {
-    console.error("Error connecting to MongoDB:", error);
-  } finally {
-    mongoose.connection.close();
+    console.error(`Error verifying email`, error);
+    throw error;
   }
-}
-module.exports = importDomain;
+};
+
+module.exports = verifyEmail;
