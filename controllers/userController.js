@@ -22,14 +22,16 @@ module.exports.register = async (req, res) => {
   }
 
   try {
-    const verificationResult = await verifyEmail(email);
+    const emailVerificationResult = await verifyEmail(email);
 
     // Handling the verificationResult
-    if (verificationResult.status != "valid") {
+    if (emailVerificationResult.status != "valid") {
       return res.status(400).json({
         message: "Invalid or disposable email. Use valid email address",
       });
     }
+
+    cons;
 
     // check if user already exists
     const existingUser = await User.findOne({ email });
