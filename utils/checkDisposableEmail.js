@@ -14,7 +14,7 @@ const verifyEmail = async (email) => {
 
   try {
     const request = await axios.request(options);
-    console.log(request.data);
+    return request.data;
   } catch (error) {
     console.error(`Error verifying email`, error);
     throw error;
@@ -22,3 +22,13 @@ const verifyEmail = async (email) => {
 };
 
 module.exports = verifyEmail;
+// (async () => {
+//   try {
+//     const email = "dexejo3991@kwalah.com";
+//     const verificationResult = await verifyEmail(email);
+
+//     console.log(verificationResult);
+//   } catch (error) {
+//     console.error(`Error during api call`, error.message);
+//   }
+// })();

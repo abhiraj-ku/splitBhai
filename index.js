@@ -1,14 +1,14 @@
 require("dotenv").config();
 const express = require("express");
 const app = express();
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT;
 
 const connectDB = require("./db/db");
 
 var morgan = require("morgan");
 
 // call the db connection url
-// connectDB();
+connectDB();
 
 // Middleware to parse json and urlEncoded
 app.use(express.urlencoded({ extended: true }));

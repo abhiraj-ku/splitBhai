@@ -10,7 +10,7 @@ const { error } = require("console");
 // promisify Redis function for avoiding callback hell
 const setAsync = promisify(redisClient.set).bind(redisClient);
 const getAsync = promisify(redisClient.get).bind(redisClient);
-const delAsync = promisify(redisClient.del).bind(redisClient);
+// const delAsync = promisify(redisClient.del).bind(redisClient);
 const expireAsync = promisify(redisClient.expire).bind(redisClient);
 
 // use crypto to generate secure 6 digit code
