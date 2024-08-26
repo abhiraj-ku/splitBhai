@@ -1,8 +1,7 @@
 const User = require("../models/userModel");
 const bcrypt = require("bcryptjs");
 const { storeuser } = require("../services/emailServices");
-const verifyEmail = require("../utils/checkDisposableEmail");
-
+const { verifyEmail, verifyPhone } = require("../utils/isContactsValid");
 // Register a new user
 module.exports.register = async (req, res) => {
   const { name, email, password, phone } = req.body;
@@ -31,7 +30,14 @@ module.exports.register = async (req, res) => {
       });
     }
 
-    cons;
+    const phoneVerificationResult = await verifyPhone(phone);
+
+    // Handling the phone verification result
+    if (phoneVerificationResult.status != "VALID_CONFIRMED") {
+      return res.status(400).json({
+        message: "Invalid phone number , Please try again with another number",
+      });
+    }
 
     // check if user already exists
     const existingUser = await User.findOne({ email });
