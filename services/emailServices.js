@@ -4,8 +4,6 @@ const fs = require("fs");
 const path = require("path");
 const redisClient = require("./redisServer");
 const nodemailer = require("nodemailer");
-const { rejects } = require("assert");
-const { error } = require("console");
 
 // promisify Redis function for avoiding callback hell
 const setAsync = promisify(redisClient.set).bind(redisClient);
