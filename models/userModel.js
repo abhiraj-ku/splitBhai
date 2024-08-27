@@ -15,6 +15,10 @@ const userSchema = new mongoose.Schema({
     lowercase: true,
     trim: true,
   },
+  emailVerified: {
+    type: Boolean,
+    default: false,
+  },
   password: {
     type: String,
     required: true,
@@ -90,9 +94,13 @@ userSchema.methods.comparePassword = async function (userPassword) {
 
 // Generate jwt token
 userSchema.methods.createJwtToken = function () {
-  return JWT.sign({ userId: this._id }.process.env.JWT_SECRET, {
-    expiresIn: "1d",
-  });
+  return JWT.sign(
+    { userId: this._id, email: this.email },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: "1h",
+    }
+  );
 };
 
 module.exports = mongoose.model("User", userSchema);

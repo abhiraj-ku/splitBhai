@@ -1,7 +1,8 @@
 const User = require("../models/userModel");
 const bcrypt = require("bcryptjs");
-const { storeuser } = require("../services/emailServices");
+const { storeuser, verifyCode } = require("../services/emailServices");
 const { verifyEmail, verifyPhone } = require("../utils/isContactsValid");
+
 // Register a new user
 module.exports.register = async (req, res) => {
   const { name, email, password, phone } = req.body;
@@ -76,3 +77,75 @@ module.exports.register = async (req, res) => {
     });
   }
 };
+
+// TODO : Implement the login route
+module.exports.login = async (req, res) => {
+  const { email, password } = req.body;
+};
+
+// verify Email route
+module.exports.verifyEmail = async (req, res) => {
+  const { email, code } = req.body;
+
+  if (!email || !code) {
+    return res
+      .status(400)
+      .json({ message: "Please provide both email and verification code." });
+  }
+
+  try {
+    const verificationResult = await verifyCode(email, code);
+
+    // check if correct or not
+    if (!verificationResult) {
+      return res.status(400).json({
+        message: "Invalid verification code.",
+      });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    // check if email is already verfied
+    if (user.emailVerified) {
+      return res.status(400).json({
+        message: "Email already Verified",
+      });
+    }
+    // mark the email verified as true
+    user.emailVerified = true;
+
+    // Generate the JWT token now
+
+    const token = await user.createJwtToken();
+
+    // save the changes to db
+    await user.save();
+
+    return res.status(200).json({
+      message: "Email verified sucessfully !",
+      token,
+      user: {
+        _id: user._id,
+        Name: user.name,
+        Email: user.email,
+        emailVerified: user.emailVerified,
+      },
+    });
+
+    // save
+  } catch (error) {
+    console.error(`Error Verifying code:`, error);
+    return res.status(500).json({
+      message: "Server error during verification. Please try again later.",
+    });
+  }
+};
+
+// TODO: Implement the forgot password
+
+// TODO: Implement the update password
+
+// TODO: Implement the
