@@ -124,4 +124,9 @@ async function verifyCode(email, code) {
 
 // export all three functions
 
-module.exports = { storeuser, sendVerificationCode, verifyCode };
+module.exports = {
+  genSecureVerificationCode,
+  storeuser,
+  sendVerificationCode,
+  verifyCode,
+};

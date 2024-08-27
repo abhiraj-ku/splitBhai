@@ -47,6 +47,13 @@ module.exports.register = async (req, res) => {
       });
     }
 
+    // Generate verification code and save this to redis with TTL of 3 minutes
+    await storeuser(name, email);
+
+    // send verification code via email
+
+    await sendVerificationCode(email);
+
     // Create the user
     const user = await User.create({
       name,
