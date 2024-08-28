@@ -1,0 +1,22 @@
+name: splitBhai Backend
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout code repo
+        uses: actions/checkout@v3
+
+      - name: set up node js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+
+      - name: install dependencies
+        run: npm install
