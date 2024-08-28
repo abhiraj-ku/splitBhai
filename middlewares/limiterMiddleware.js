@@ -43,3 +43,17 @@ async function createRateLimiter() {
 }
 
 module.exports = createRateLimiter;
+
+process.on("SIGINT", async () => {
+  await client.quit();
+  console.log(`Redis diconnected for limiter client`);
+
+  process.exit(0);
+});
+
+process.on("SIGTERM", async () => {
+  await client.quit();
+  console.log(`Redis diconnected for limiter client`);
+
+  process.exit(0);
+});

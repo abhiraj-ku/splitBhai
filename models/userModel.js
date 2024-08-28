@@ -94,13 +94,22 @@ userSchema.methods.comparePassword = async function (userPassword) {
 
 // Generate jwt token
 userSchema.methods.createJwtToken = function () {
-  return JWT.sign(
-    { userId: this._id, email: this.email },
-    process.env.JWT_SECRET,
-    {
-      expiresIn: "1h",
-    }
-  );
+  // Ensure `process.env.JWT_SECRET` is set correctly
+  if (!process.env.JWT_SECRET) {
+    throw new Error("JWT_SECRET environment variable is not set.");
+  }
+
+  try {
+    // Create a JWT token
+    return jwt.sign(
+      { userId: this._id, email: this.email }, // Payload
+      process.env.JWT_SECRET, // Secret key
+      { expiresIn: "1d" } // Token expiration
+    );
+  } catch (error) {
+    console.error("Error generating JWT token:", error);
+    throw new Error("Error generating JWT token");
+  }
 };
 
 module.exports = mongoose.model("User", userSchema);

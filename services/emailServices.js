@@ -38,6 +38,8 @@ async function storeuser(name, email) {
 
     await setAsync(email, userData);
     await expireAsync(email, 180);
+
+    console.log(`User details saved to redis for 3 mins `);
   } catch (error) {
     console.error(`Error while saving data to redis..`, error);
   }

@@ -2,6 +2,7 @@ const User = require("../models/userModel");
 const bcrypt = require("bcryptjs");
 const { storeuser, verifyCode } = require("../services/emailServices");
 const { verifyEmail, verifyPhone } = require("../utils/isContactsValid");
+const cookieToken = require("../utils/cookieToken");
 
 // Register a new user
 module.exports.register = async (req, res) => {
@@ -78,9 +79,41 @@ module.exports.register = async (req, res) => {
   }
 };
 
-// TODO : Implement the login route
+//Login Route for the system
 module.exports.login = async (req, res) => {
   const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res
+      .status(400)
+      .json({ message: "Email and password are required." });
+  }
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ message: "Invalid email or password." });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Invalid email or password." });
+    }
+
+    if (!user.emailVerified) {
+      return res
+        .status(403)
+        .json({ message: "Email not verified. Please verify your email." });
+    }
+
+    // Generate and set the authentication cookie
+    await cookieToken(user, res);
+  } catch (error) {
+    console.error("Error during login:", error);
+    res
+      .status(500)
+      .json({ message: "Server error during login. Please try again later." });
+  }
 };
 
 // verify Email route
@@ -117,12 +150,11 @@ module.exports.verifyEmail = async (req, res) => {
     // mark the email verified as true
     user.emailVerified = true;
 
-    // Generate the JWT token now
-
-    const token = await user.createJwtToken();
-
     // save the changes to db
     await user.save();
+
+    // Generate the JWT token now
+    await cookieToken(user, res);
 
     return res.status(200).json({
       message: "Email verified sucessfully !",
@@ -144,8 +176,49 @@ module.exports.verifyEmail = async (req, res) => {
   }
 };
 
-// TODO: Implement the forgot password
+// Logout Route for the app
+module.exports.logout = async (req, res) => {
+  res.clearCookie("token", { httpOnly: true }).status(200).json({
+    message: "Logged out successfully",
+  });
+};
 
-// TODO: Implement the update password
+// Resend email verification code
+exports.resendVerificationEmail = async (req, res) => {
+  try {
+    const { email } = req.body;
 
-// TODO: Implement the
+    // Check if the email exists in Redis
+    const userData = await getAsync(email);
+
+    if (!userData) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const user = JSON.parse(userData);
+
+    // Check if the user is already verified
+    if (user.verified) {
+      return res.status(400).json({ message: "User is already verified" });
+    }
+
+    // Store user in Redis and get a new verification code
+    await storeuser(user.name, email);
+
+    // Send the verification code via email
+    await sendVerificationCode(email);
+
+    return res
+      .status(200)
+      .json({ message: "Verification email resent successfully" });
+  } catch (error) {
+    console.error("Error in resendVerificationEmail:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// TODO: Implement the forgot password route
+
+// TODO: Implement the update password route
+
+// TODO: Implement the reset token route
