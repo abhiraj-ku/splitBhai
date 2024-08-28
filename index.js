@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 const PORT = process.env.PORT;
+const cookieParser = require("cookie-parser");
 
 const connectDB = require("./db/db");
 
@@ -13,6 +14,9 @@ connectDB();
 // Middleware to parse json and urlEncoded
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+// cookie parser Middleware
+app.use(cookieParser);
 
 // HTTP request logger middleware
 app.use(morgan("tiny"));

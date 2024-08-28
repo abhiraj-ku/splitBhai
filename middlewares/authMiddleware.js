@@ -5,7 +5,7 @@ if (!jwtsecret) {
   throw new Error("Missing JWt token from env variable");
 }
 
-const isLoggedIn = async (req, res, next) => {
+const isAuthorized = async (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith("Bearer")) {
     next("Authentication Failed");
@@ -13,11 +13,11 @@ const isLoggedIn = async (req, res, next) => {
   const token = authHeader.split(" ")[1];
   try {
     const payload = JWT.verify(token, jwtsecret);
-    req.body.user = { userId: payload.userId };
+    req.user = { userId: payload.userId };
     next();
   } catch (error) {
     return next(new Error("Auth failed"));
   }
 };
 
-module.exports = isLoggedIn;
+module.exports = isAuthorized;

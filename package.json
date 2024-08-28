@@ -13,6 +13,7 @@
   "dependencies": {
     "axios": "^1.7.4",
     "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.6",
     "csv-parser": "^3.0.0",
     "disposable-email-domains": "^1.0.62",
     "dotenv": "^16.4.5",
