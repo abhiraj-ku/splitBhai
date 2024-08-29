@@ -27,10 +27,6 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
-    code: {
-      type: String,
-      required: true,
-    },
   },
   avatar: {
     type: String, // URL to the user's profile picture
