@@ -4,7 +4,7 @@ const app = express();
 const PORT = process.env.PORT;
 const cookieParser = require("cookie-parser");
 
-const connectDB = require("./db/db");
+const connectDB = require("./src/db/db");
 
 var morgan = require("morgan");
 
@@ -29,7 +29,7 @@ app.get("/home", (req, res) => {
 });
 
 // user route
-const userRoute = require("./routes/userRoute");
+const userRoute = require("./src/routes/userRoute");
 
 // user route middleware
 app.use("/user/new", userRoute);
