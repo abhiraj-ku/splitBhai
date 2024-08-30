@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const { storeuser, verifyCode } = require("../services/emailServices");
 const { verifyEmail, verifyPhone } = require("../utils/isContactsValid");
 const cookieToken = require("../utils/cookieToken");
+const { validateUsersChoice } = require("../helpers/validateUserChoice");
 
 // Register a new user
 module.exports.register = async (req, res) => {
@@ -67,8 +68,11 @@ module.exports.register = async (req, res) => {
 
     password = undefined;
 
+    const token = await user.createJwtToken();
+
     res.status(200).json({
       message: "User created successfully",
+      token,
       user,
     });
   } catch (error) {
@@ -222,3 +226,41 @@ exports.resendVerificationEmail = async (req, res) => {
 // TODO: Implement the update password route
 
 // TODO: Implement the reset token route
+
+// Take user's choice to create group or join group
+
+module.exports.handleUserChoice = async (req, res) => {
+  const { choice } = req.body;
+
+  try {
+    const validOptions = ["create", "join"];
+    const validation = validateUsersChoice(choice, validOptions);
+
+    if (!validation.isValid) {
+      return res.status(400).json({
+        message: validation.message,
+      });
+    }
+
+    const userID = req.user.userID;
+    if (!userID) {
+      return res.status(401).json({ message: "User not authenticated." });
+    }
+    switch (choice) {
+      case "create":
+        return createGroup(req, res);
+      case "join":
+        return joinGroup(req, res);
+
+      default:
+        return res.status(400).json({
+          message: `Invalid user choice`,
+        });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      message:
+        "Server error while handling user choice. Please try again later.",
+    });
+  }
+};

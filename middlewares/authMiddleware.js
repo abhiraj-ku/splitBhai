@@ -1,23 +1,32 @@
 const JWT = require("jsonwebtoken");
+const User = require("../models/userModel");
 
 const jwtsecret = process.env.JWT_SECRET;
 if (!jwtsecret) {
-  throw new Error("Missing JWt token from env variable");
+  throw new Error("Missing JWT token from env variable");
 }
-
-const isAuthorized = async (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith("Bearer")) {
-    next("Authentication Failed");
-  }
-  const token = authHeader.split(" ")[1];
+module.exports.isAuthorized = async (req, res, next) => {
   try {
-    const payload = JWT.verify(token, jwtsecret);
-    req.user = { userId: payload.userId };
-    next();
+    const token =
+      req.cookie.token ||
+      (req.headers.authorization || "").replace("Bearer", "");
+
+    // Verify if token is present or not
+    if (!token) {
+      console.log(`Missing header token`);
+      throw new Error(`No token found , please login to generate`);
+    }
+
+    // verify the jwt token from cookie
+    const decodeToken = JWT.verify(token, jwtsecret);
+
+    // find and attach user object to the decoded user
+    req.user = await User.findById(decodeToken.id);
+
+    return next();
   } catch (error) {
-    return next(new Error("Auth failed"));
+    console.log(`Error while verifying token`);
+
+    return next(error);
   }
 };
-
-module.exports = isAuthorized;
