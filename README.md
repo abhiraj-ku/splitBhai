@@ -1,6 +1,8 @@
-# SplitEasy - Smart Group Expense Management
+# splitBhai - Smart Group Expense Management
 
-SplitEasy is a group expense management app that simplifies shared expenses, offers smart financial insights, and includes features like event planning, gamified debt settlement, and non-monetary bartering options.
+![MIT License](https://img.shields.io/badge/License-MIT-brightgreen)
+
+splitBhai is a group expense management app that simplifies shared expenses, offers smart financial insights, and includes features like event planning, gamified debt settlement, and non-monetary bartering options.
 
 ## Features
 
