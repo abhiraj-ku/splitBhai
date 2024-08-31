@@ -7,7 +7,10 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
+    strategy:
+      matrix:
+        node-version: [18.x]
 
     steps:
       - name: checkout code repo
@@ -17,6 +20,12 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: "18"
+          cache: "npm"
 
       - name: install dependencies
-        run: npm install
+        run: npm ci
+
+      - name: create env files
+        run: |
+          touch .env
+          echo "${{secrets.PROD_ENV_FILE}}" > .env
