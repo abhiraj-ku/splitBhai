@@ -6,8 +6,8 @@
     "start": "node index.js",
     "dev": "nodemon index.js"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["node js","redis","bill split app","docker","project"],
+  "author": "Abhishek Kumar",
   "license": "ISC",
   "description": "",
   "dependencies": {
