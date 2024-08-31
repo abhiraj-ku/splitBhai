@@ -29,3 +29,6 @@ jobs:
         run: |
           touch .env
           echo "${{secrets.PROD_ENV_FILE}}" > .env
+
+      - name: start the server in ec2
+        run: pm2 restart spliBhai-backendAPI
