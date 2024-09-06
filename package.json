@@ -6,11 +6,18 @@
     "start": "node index.js",
     "dev": "nodemon index.js"
   },
-  "keywords": ["node js","redis","bill split app","docker","project"],
+  "keywords": [
+    "node js",
+    "redis",
+    "bill split app",
+    "docker",
+    "project"
+  ],
   "author": "Abhishek Kumar",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.645.0",
     "axios": "^1.7.4",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.6",
