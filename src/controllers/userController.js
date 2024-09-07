@@ -7,6 +7,7 @@ const {
 } = require("../services/emailServices");
 const { verifyEmail, verifyPhone } = require("../utils/isContactsValid");
 const cookieToken = require("../utils/cookieToken");
+const generateUserProfileImage = require("../utils/ generateUserProfileImage");
 const { validateUsersChoice } = require("../helpers/validateUserChoice");
 const queueEmailSending = require("../services/emailsenderProducer");
 
@@ -56,7 +57,7 @@ module.exports.register = async (req, res) => {
     }
 
     // Generate verification code and save this to redis with TTL of 3 minutes
-    const verificationCode = await storeuser(name, email);
+    await storeuser(name, email);
 
     // Queue email for sending verification code
     const emailContent = await sendVerificationCode(email);
@@ -166,6 +167,26 @@ module.exports.verifyEmail = async (req, res) => {
     // mark the email verified as true
     user.emailVerified = true;
 
+    try {
+      // Generate user profile  photo
+      const profileImagePath = await generateUserProfileImage(user.name);
+
+      // upload to s3
+      const profileUrl = await uplaodToS3(
+        profileImagePath,
+        `${user.name}-profile.jpg`
+      );
+
+      // update the user avatar image
+      user.avatar = profileUrl;
+    } catch (error) {
+      console.error(`Error generating or uploading profile image:`, error);
+      return res.status(500).json({
+        message:
+          "Server error while generating profile image. Please try again.",
+      });
+    }
+
     // save the changes to db
     await user.save();
 
@@ -181,6 +202,7 @@ module.exports.verifyEmail = async (req, res) => {
         Name: user.name,
         Email: user.email,
         emailVerified: user.emailVerified,
+        avatar: user.avatar,
       },
     });
 
