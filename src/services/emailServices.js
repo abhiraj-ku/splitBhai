@@ -3,7 +3,7 @@ const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
 const redisClient = require("./redisServer");
-const nodemailer = require("nodemailer");
+const queueEmailSending = require("../services/emailsenderProducer");
 
 // promisify Redis function for avoiding callback hell
 const setAsync = promisify(redisClient.set).bind(redisClient);
@@ -82,17 +82,6 @@ async function sendVerificationCode(email) {
   // Generate the emailTemplate before the transporter
   const html = await emailTemplate(user.verificationCode);
 
-  // create nodemailer transporter
-  const transporter = nodemailer.createTransport({
-    host: "mail.privateemail.com",
-    port: 587,
-    secure: false,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
-
   const mailOptions = {
     from: "mail@abhikumar.site",
     to: email,
@@ -101,7 +90,7 @@ async function sendVerificationCode(email) {
   };
 
   try {
-    await transporter.sendMail(mailOptions);
+    await queueEmailSending(mailOptions);
     console.log(`Verification code sent sucessfully`);
   } catch (error) {
     console.error(`Error sending email to ${email}:`, error);

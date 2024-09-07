@@ -1,9 +1,14 @@
 const User = require("../models/userModel");
 const bcrypt = require("bcryptjs");
-const { storeuser, verifyCode } = require("../services/emailServices");
+const {
+  storeuser,
+  verifyCode,
+  sendVerificationCode,
+} = require("../services/emailServices");
 const { verifyEmail, verifyPhone } = require("../utils/isContactsValid");
 const cookieToken = require("../utils/cookieToken");
 const { validateUsersChoice } = require("../helpers/validateUserChoice");
+const queueEmailSending = require("../services/emailsenderProducer");
 
 // Register a new user
 module.exports.register = async (req, res) => {
@@ -51,9 +56,15 @@ module.exports.register = async (req, res) => {
     }
 
     // Generate verification code and save this to redis with TTL of 3 minutes
-    await storeuser(name, email);
+    const verificationCode = await storeuser(name, email);
 
-    // send verification code via email
+    // Queue email for sending verification code
+    const emailContent = await sendVerificationCode(email);
+    await queueEmailSending({
+      email,
+      subject: "Email Verification",
+      html: emailContent,
+    });
 
     await sendVerificationCode(email);
 
@@ -65,7 +76,7 @@ module.exports.register = async (req, res) => {
       phone,
     });
     await user.save();
-
+    // Don't send password in the response body
     password = undefined;
 
     const token = await user.createJwtToken();
@@ -140,6 +151,7 @@ module.exports.verifyEmail = async (req, res) => {
       });
     }
 
+    // find user in database
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ message: "User not found." });
@@ -158,6 +170,7 @@ module.exports.verifyEmail = async (req, res) => {
     await user.save();
 
     // Generate the JWT token now
+    const token = await user.createJwtToken();
     await cookieToken(user, res);
 
     return res.status(200).json({
@@ -207,10 +220,15 @@ exports.resendVerificationEmail = async (req, res) => {
     }
 
     // Store user in Redis and get a new verification code
-    await storeuser(user.name, email);
+    const verificationCode = await storeuser(user.name, email);
 
-    // Send the verification code via email
-    await sendVerificationCode(email);
+    // Generate email content and queue the email for sending
+    const emailContent = await sendVerificationCode(email);
+    await queueEmailSending({
+      email,
+      subject: "Resend Email Verification",
+      html: emailContent,
+    });
 
     return res
       .status(200)
