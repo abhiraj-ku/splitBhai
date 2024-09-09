@@ -1,10 +1,9 @@
 const axios = require("axios");
-const phone_ver_key = process.env.PHONE_VER_API_KEY;
-const email_ver_key = process.env.RAPID_API_KEY;
+const { rapidApiKey, phoneVerApiKey } = require("./constants");
 
 // Function to verify disposable and valid email
 const verifyEmail = async (email) => {
-  if (!email_ver_key) {
+  if (rapidApiKey === undefined) {
     throw new Error("Missing email verification API key.");
   }
 
@@ -20,6 +19,7 @@ const verifyEmail = async (email) => {
 
   try {
     const request = await axios.request(options);
+    console.log(request.data);
     return request.data;
   } catch (error) {
     console.error("Error verifying email:", error);
@@ -29,7 +29,7 @@ const verifyEmail = async (email) => {
 
 // Function to verify phone number
 const verifyPhone = async (phone) => {
-  if (!phone_ver_key) {
+  if (!phoneVerApiKey) {
     throw new Error("Missing phone verification API key.");
   }
 

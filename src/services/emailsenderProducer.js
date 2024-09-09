@@ -1,6 +1,6 @@
-const { promisify } = require("utile");
+const { promisify } = require("util");
 const redisClient = require("./redisServer");
-const rpushAsync = promisify(redisClient.rpush).bind(redisClient);
+const rpushAsync = promisify(redisClient.rPush).bind(redisClient);
 
 // function to add a job to email queue
 async function queueEmailSending(mailOptions) {

@@ -21,7 +21,8 @@ const cookieToken = async (user, res) => {
     httpOnly: true,
   };
 
-  re.status(200)
+  res
+    .status(200)
     .cookie("token", token, options)
     .json({
       success: true,

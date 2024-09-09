@@ -1,11 +1,5 @@
 const mongoose = require("mongoose");
 
-// Connection options
-const options = {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-};
-
 // Retry options
 // const retryOptions = {
 //   maxAttempt: 5,
@@ -16,7 +10,7 @@ const options = {
 //  Connect to MongoDB without retry logic for dev env
 function connectDB() {
   mongoose
-    .connect(process.env.DB_URI, options)
+    .connect(process.env.DB_URI)
     .then(() => {
       console.log(`Connected to MongoDB successfully`);
     })

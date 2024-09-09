@@ -1,3 +1,7 @@
 /node_modules
 .env
 /profile_photo
+
+
+#ignore specific file
+src/utils/constants.js

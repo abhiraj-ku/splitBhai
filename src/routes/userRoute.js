@@ -1,10 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const limitRoute = require("../middlewares/limiterMiddleware");
+const auth = require("../middlewares/authMiddleware");
 
 const {
   register,
-  verifyCode,
+  verifyEmail,
   login,
   logout,
   handleUserChoice,
@@ -12,10 +13,13 @@ const {
 
 router.post("/register", register);
 router.post("/login", limitRoute, login);
-router.post("/verify-mail", verifyCode);
+router.post("/verify", verifyEmail);
 router.post("/logout", logout);
-router.post("/resend-verification", limitRoute, verifyCode);
 
-router.post("/choice", auth, handleUserChoice);
+// TODO: fix verifycode is not defined
+// router.post("/resend-verification", limitRoute, verifyCode);
+
+// TODO: fix the issue in handleUserChoice controller
+// router.post("/choice", auth, handleUserChoice);
 
 module.exports = router;

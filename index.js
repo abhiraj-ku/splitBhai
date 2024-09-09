@@ -16,7 +16,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // cookie parser Middleware
-app.use(cookieParser);
+app.use(cookieParser());
 
 // HTTP request logger middleware
 app.use(morgan("tiny"));
@@ -33,7 +33,6 @@ const userRoute = require("./src/routes/userRoute");
 
 // user route middleware
 app.use("/user/new", userRoute);
-app.use("/user/verify", userRoute);
 
 const server = app.listen(PORT, () => {
   console.log(`server is running on the port: ${PORT}`);

@@ -95,7 +95,7 @@ qrcode.toDataURL(otpauthUrl, { width: 300 }, (err, url) => {
     function verifyOTP() {
       const secret = "${secret.base32}";
       const userProvidedCode = document.getElementById("otpInput").value;
-      
+
       // Send request to server for OTP verification (replace this with actual server request)
       fetch('/verify', {
         method: 'POST',

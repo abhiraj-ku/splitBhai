@@ -30,7 +30,9 @@ module.exports.register = async (req, res) => {
   }
 
   try {
-    const emailVerificationResult = await verifyEmail(email);
+    // Run email and phone verifications in parallel
+    const [emailVerificationResult, phoneVerificationResult] =
+      await Promise.all([verifyEmail(email), verifyPhone(phone)]);
 
     // Handling the verificationResult
     if (emailVerificationResult.status != "valid") {
@@ -38,8 +40,6 @@ module.exports.register = async (req, res) => {
         message: "Invalid or disposable email. Use valid email address",
       });
     }
-
-    const phoneVerificationResult = await verifyPhone(phone);
 
     // Handling the phone verification result
     if (phoneVerificationResult.status != "VALID_CONFIRMED") {
@@ -59,6 +59,8 @@ module.exports.register = async (req, res) => {
     // Generate verification code and save this to redis with TTL of 3 minutes
     await storeuser(name, email);
 
+    // TODO: Fix the queue imports and how they are used
+
     // Queue email for sending verification code
     const emailContent = await sendVerificationCode(email);
     await queueEmailSending({
@@ -66,8 +68,6 @@ module.exports.register = async (req, res) => {
       subject: "Email Verification",
       html: emailContent,
     });
-
-    await sendVerificationCode(email);
 
     // Create the user
     const user = await User.create({
@@ -77,15 +77,13 @@ module.exports.register = async (req, res) => {
       phone,
     });
     await user.save();
-    // Don't send password in the response body
-    password = undefined;
 
     const token = await user.createJwtToken();
 
     res.status(200).json({
       message: "User created successfully",
       token,
-      user,
+      user: { name: user.name, email: user.email, phone: user.phone },
     });
   } catch (error) {
     console.error("Error during registration:", error);
@@ -242,7 +240,7 @@ exports.resendVerificationEmail = async (req, res) => {
     }
 
     // Store user in Redis and get a new verification code
-    const verificationCode = await storeuser(user.name, email);
+    await storeuser(user.name, email);
 
     // Generate email content and queue the email for sending
     const emailContent = await sendVerificationCode(email);
