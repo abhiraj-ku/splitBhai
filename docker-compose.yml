@@ -5,29 +5,39 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: splitBhai-app
+    volumes:
+      - .:/app
     ports:
       - "4040:4040"
-
+    env_file:
+      - "./env"
+    environment:
+      - DB_URI=mongodb://mongo:27017/splitbhai
+      - REDIS_URL=redis://redis:6379
     depends_on:
       - mongo
       - redis
-    environment:
-      - MONGO_URI=mongodb://mongo:27017/splitBhaiDB
-      - REDIS_URL=redis://redis:6379
+    restart: unless-stopped
 
-  mongo:
-    image: mongo:latest
-    name: mongo_db
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo_data:/data/db
+mongo:
+  image: mongo:6
+  container_name: splitBhai-mognoDB
+  ports:
+    - "27017:27017"
+  volumes:
+    - mongo-data:/data/db
+  restart: unless-stopped
 
-  redis:
-    image: redis:lates
-    container_name: redis_db
-    ports:
-      - "6379:6379"
+redis:
+  image: redis:7
+  container_name: splitBhai-cacheDB
+  ports:
+    - "6379:6379"
+  volumes:
+    - redis-data:/data
+  restart: unless-stopped
 
-volumes: mongo-data
-  redis-data
+volumes:
+  mongo-data:
+  redis-data:
