@@ -1,0 +1,33 @@
+version: "3.8"
+
+services:
+  node:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "4040:4040"
+
+    depends_on:
+      - mongo
+      - redis
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/splitBhaiDB
+      - REDIS_URL=redis://redis:6379
+
+  mongo:
+    image: mongo:latest
+    name: mongo_db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  redis:
+    image: redis:lates
+    container_name: redis_db
+    ports:
+      - "6379:6379"
+
+volumes: mongo-data
+  redis-data
