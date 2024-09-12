@@ -40,7 +40,7 @@ module.exports.joinGroup = async (req, res) => {
     }
 
     // Add the user to the group
-    group.members.push({ user: req.user.id });
+    group.members.push({ user: req.user.id, role: "member" });
     await group.save();
 
     // Return a success message
