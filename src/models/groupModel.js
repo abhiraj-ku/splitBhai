@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const groupSchema = new mongoose.Schema({
-  name: {
+  groupName: {
     type: String,
     required: true,
     trim: true,
@@ -9,6 +9,11 @@ const groupSchema = new mongoose.Schema({
   description: {
     type: String,
     trim: true,
+  },
+  groupCode: {
+    type: String,
+    required: true,
+    unique: true,
   },
   members: [
     {
