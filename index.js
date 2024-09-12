@@ -3,6 +3,7 @@ const express = require("express");
 const app = express();
 const PORT = process.env.PORT;
 const cookieParser = require("cookie-parser");
+const monogoSanitize = require("express-mongo-sanitize");
 
 const connectDB = require("./src/db/db");
 
@@ -14,6 +15,7 @@ connectDB();
 // Middleware to parse json and urlEncoded
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(monogoSanitize());
 
 // cookie parser Middleware
 app.use(cookieParser());

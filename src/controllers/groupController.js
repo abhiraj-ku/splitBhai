@@ -1,9 +1,47 @@
 const groupModel = require("../models/groupModel");
+const validator = require("validator");
 
-// TODO: implement the create group func wrt to frontend design
-module.exports.createGroup = async (req, res) => {};
+// TODO: implement the stage of create group(add group member via invite)
+module.exports.createGroup = async (req, res) => {
+  const { stage, groupData, members } = req.body;
+  try {
+    // Stage 1: Group name and group description(optional)
+    if (stage == 1) {
+      // Extract the nested group details from groupData
+      const { groupName, description } = groupData;
+      if (!groupName || !validator.isLength(groupName.trim(), { min: 1 })) {
+        // description is optional
+        return res.status(400).json({ message: "Group name is required." });
+      }
 
-// TODO: implement the join group func wrt to frontend design
+      // Sanitize the input before saving
+      const sanitizedGroupName = validator.escape(groupName.trim());
+      const sanitizedGroupDescription = description
+        ? validator.escape(description.trim())
+        : " ";
+      // Create the group (no members yet)
+      const newgroup = await groupModel.create({
+        groupName: sanitizedGroupName,
+        description: sanitizedGroupDescription,
+        createdBy: req.user.id,
+      });
+
+      // save the groupInfo to DB(without group members)
+      await newgroup.save();
+      return res.status(200).json({
+        message: "Group created successfully. Proceed to add members.",
+        groupId: newgroup._id,
+      });
+    }
+
+    // Stage 2: Add member and send invites
+    if (stage == 2) {
+      const { groupId } = groupData;
+    }
+  } catch (error) {}
+};
+
+// TODO: add option to check if user is signed in or not (redirect to register/login if nots)
 module.exports.joinGroup = async (req, res) => {
   const { groupName, groupCode } = req.body;
 
@@ -47,7 +85,6 @@ module.exports.joinGroup = async (req, res) => {
     return res.status(200).json({
       message: "You have successfully joined the group",
     });
-    return;
   } catch (error) {
     console.error(error);
     return res

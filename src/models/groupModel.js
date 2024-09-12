@@ -9,6 +9,7 @@ const groupSchema = new mongoose.Schema({
   description: {
     type: String,
     trim: true,
+    maxLength: [40, "Description cannot be more than 40 characters"],
   },
   groupCode: {
     type: String,
@@ -43,6 +44,7 @@ const groupSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
+    unique: true,
   },
 });
 

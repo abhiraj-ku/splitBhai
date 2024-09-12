@@ -4,6 +4,6 @@ const limitRoute = require("../middlewares/limiterMiddleware");
 const auth = require("../middlewares/authMiddleware");
 const { joinGroup } = require("../controllers/groupController");
 
-router.post("/group/join", joinGroup);
+router.post("/group/join", auth, joinGroup);
 
 module.exports = router;
