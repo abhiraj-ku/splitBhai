@@ -34,3 +34,7 @@ Stay updated with reminders and alerts for upcoming payments, event activities, 
 2.  **Add Expenses**: Track shared expenses and split them fairly among the group members.
 3.  **Settle Debts**: Either pay directly or use non-monetary options to clear up what you owe.
 4.  **Plan Events**: Group and tag expenses for specific events, making it easier to manage big plans like vacations or parties.
+
+## Developer Documentation
+
+For developers interested in learning more about splitBhai, visit the project documentation: [splitBhai Developer Docs](https://github.com/abhiraj-ku/splitBhai/blob/main/docs/Project.md)
