@@ -31,12 +31,23 @@ module.exports.createGroup = async (req, res) => {
       return res.status(200).json({
         message: "Group created successfully. Proceed to add members.",
         groupId: newgroup._id,
+        nextStage: 2,
       });
     }
 
     // Stage 2: Add member and send invites
     if (stage == 2) {
       const { groupId } = groupData;
+      const { members } = req.body;
+      if (!groupId || !members || members.length === 0) {
+        return res.status(400).json({
+          message: "Group ID and member's email required",
+        });
+      }
+      const groupById = await groupModel.findById({ groupId });
+      if (!groupById) {
+        return res.status(404).json({ message: "Group not found." });
+      }
     }
   } catch (error) {}
 };

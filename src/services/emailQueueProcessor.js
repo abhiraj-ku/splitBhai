@@ -1,6 +1,7 @@
 const { promisify } = require("util");
 const redisClient = require("./redisServer");
 const nodemailer = require("nodemailer");
+const { json } = require("stream/consumers");
 
 // Using promisify to convert the callback based to promise chains
 const rpushAsync = promisify(redisClient.rPush).bind(redisClient);
@@ -14,8 +15,6 @@ const zremAsync = promisify(redisClient.zRem).bind(redisClient);
 // Options for retry and queue names
 const MAX_RETRIES = 3;
 const RETRY_DELAY_MS = 2000;
-const RETRY_QUEUE = "retry_queue";
-const DLQ_KEY = "email_dlq";
 
 // Function to send email using Nodemailer
 async function sendMailWithRetry(mailOptions) {
@@ -33,60 +32,60 @@ async function sendMailWithRetry(mailOptions) {
   await transporter.sendMail(mailOptions);
 }
 
-// process email from queue and handle retries
-async function processEmailQueue() {
-  const jobData = await lpopAsync("email_queue");
-  if (!jobData) return;
+// modular approach to handle different queue
 
-  const job = JSON.parse(jobData);
-  const { mailOptions, retries } = job;
+async function processQueue(queueName, retryQueueName, dlqName) {
+  const job = await lpopAsync(queueName);
+  if (!job) return;
+
+  // parse the queue information
+  const jobData = json.parse(jobData);
+  const { mailOptions, retries } = jobData;
 
   try {
+    // Send email from respective queue
     await sendMailWithRetry(mailOptions);
   } catch (error) {
-    console.error(`Email Sending failed : ${error.message}`);
+    console.error(`Error sending email from ${queueName}:`, error.message);
 
-    // Retry Logic based on the retries and MAX_RETRIES
     if (retries < MAX_RETRIES) {
-      console.log(`Retrying job.. Attempt ${retries + 1}`);
-
-      // increase the retries so that it doesn't remain the main queue
+      // Retry Logic: increment retries and add to retry queue
+      console.log(`Retrying job from ${queueName}... Attempt ${retries + 1}`);
       job.retries += 1;
-
-      // add to retry queue
       await zaddAsync(
-        RETRY_QUEUE,
+        retryQueueName,
         Date.now() + RETRY_DELAY_MS,
         JSON.stringify(job)
       );
     } else {
-      console.log(`Moving to dlq after ${MAX_RETRIES} attempts`);
-      await rpushAsync(DLQ_KEY, JSON.stringify(job));
+      // If max retries are reached, move to DLQ
+      console.log(
+        `Moving job from ${queueName} to DLQ after ${MAX_RETRIES} attempts`
+      );
+      await rpushAsync(dlqName, JSON.stringify(job));
     }
   }
 }
 
-// Process the RETRY_QUEUE
-async function processRetryQueue() {
+// Generic function to process retry queues
+async function processRetryQueue(retryQueueName, mainQueueName) {
   const timeNow = Date.now();
-  const retryJobs = await zrangebyscoreAsync(RETRY_QUEUE, "-inf", timeNow);
-
-  //   for (let i = 0; i < retryJobs.length(); i++) {
-  //     await rpushAsync("email_queue", jobData); // Re-add to queue
-  //     await zremAsync(RETRY_QUEUE, jobData);
-  //   }
+  const retryJobs = await zrangebyscoreAsync(retryQueueName, "-inf", timeNow);
 
   for (const jobData of retryJobs) {
-    await rpushAsync("email-queue", jobData);
-    await zremAsync(RETRY_QUEUE, jobData);
+    // Re-add job to the main queue and remove from retry queue
+    await rpushAsync(mainQueueName, jobData);
+    await zremAsync(retryQueueName, jobData);
   }
 }
 
-// Poll the main email queue and retry queue periodicallly
-setInterval(processEmailQueue, 1000); // process jobs(main email queue) periodically
-setInterval(processRetryQueue, 1000); // check the retry queue every seconds
-
+// Periodic queue polling function
+function pollQueues(mainQueueName, retryQueueName, dlqName) {
+  setInterval(() => processQueue(mainQueueName, retryQueueName, dlqName), 1000);
+  setInterval(() => processRetryQueue(retryQueueName, mainQueueName), 1000);
+}
 module.exports = {
-  processEmailQueue,
-  processRetryQueue,
+  pollEmailQueue: () => pollQueues("email_queue", "retry_queue", "email_dlq"),
+  pollInviteQueue: () =>
+    pollQueues("invite_queue", "retry_invite_queue", "invite_dlq"),
 };

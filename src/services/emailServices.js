@@ -3,7 +3,7 @@ const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
 const redisClient = require("./redisServer");
-const queueEmailSending = require("../services/emailsenderProducer");
+const queueEmailSending = require("./emailQueueProducer");
 
 // promisify Redis function for avoiding callback hell
 const setAsync = promisify(redisClient.set).bind(redisClient);

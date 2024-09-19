@@ -2,7 +2,7 @@ const { promisify } = require("util");
 const redisClient = require("./redisServer");
 const rpushAsync = promisify(redisClient.rPush).bind(redisClient);
 
-// function to add a job to email queue
+// function to add  verify-email to email queue
 async function queueEmailSending(mailOptions) {
   const jobData = JSON.stringify({
     mailOptions,
@@ -18,4 +18,21 @@ async function queueEmailSending(mailOptions) {
   }
 }
 
-module.exports = queueEmailSending;
+async function queueInviteEmailSending(mailOptions) {
+  const job = json.stringify({
+    mailOptions,
+    retries: 0,
+  });
+  try {
+    await rpushAsync("invite_queue", job);
+    console.log(`invite emails addded to queue`);
+  } catch (error) {
+    console.error(`Error adding emails to invite queue`);
+    throw new Error(`Error adding emails to invite queue`);
+  }
+}
+
+module.exports = {
+  queueEmailSending,
+  queueInviteEmailSending,
+};

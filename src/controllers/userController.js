@@ -9,7 +9,7 @@ const { verifyEmail, verifyPhone } = require("../utils/isContactsValid");
 const cookieToken = require("../utils/cookieToken");
 const generateUserProfileImage = require("../utils/ generateUserProfileImage");
 const { validateUsersChoice } = require("../helpers/validateUserChoice");
-const queueEmailSending = require("../services/emailsenderProducer");
+const queueEmailSending = require("../services/emailQueueProducer");
 
 // Register a new user
 module.exports.register = async (req, res) => {
