@@ -39,7 +39,7 @@ async function processQueue(queueName, retryQueueName, dlqName) {
   if (!job) return;
 
   // parse the queue information
-  const jobData = json.parse(jobData);
+  const jobData = json.parse(job);
   const { mailOptions, retries } = jobData;
 
   try {

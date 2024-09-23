@@ -1,9 +1,10 @@
 const groupModel = require("../models/groupModel");
 const validator = require("validator");
+const { queueInviteEmailSending } = require("../services/emailQueueProducer");
 
 // TODO: implement the stage of create group(add group member via invite)
 module.exports.createGroup = async (req, res) => {
-  const { stage, groupData, members } = req.body;
+  const { stage, groupData } = req.body;
   try {
     // Stage 1: Group name and group description(optional)
     if (stage == 1) {
@@ -48,8 +49,48 @@ module.exports.createGroup = async (req, res) => {
       if (!groupById) {
         return res.status(404).json({ message: "Group not found." });
       }
+
+      // Send emails to all the members mentioned
+      // make sure the member.length <=25
+      if (members.length > 25) {
+        return res.status(400).json({
+          message: "Members length exceeds 25",
+        });
+      }
+      // Verify each email if it is valid or not then add to redis queue
+      for (const member of members) {
+        if (!validator.isEmail(member)) {
+          return res.status(400).json({ message: `Invalid email: ${member}` });
+        }
+
+        // construct a mail option to send as invite
+        const mailOptions = {
+          from: `"SplitBhai Team" <backend.team@splitbhai.com>`,
+          to: member,
+          subject: `You're Invited to join the ${groupById.groupName} by your friends on SplitBhai`,
+          text: `Hello, \n\nYou have been invited to join the group "${groupById.groupName}". Use this invite code to join: ${groupById._id}.`,
+        };
+
+        try {
+          await queueInviteEmailSending(mailOptions);
+        } catch (error) {
+          console.error(
+            `Error adding emails to invite queue: ${error.message}`
+          );
+          return res
+            .status(500)
+            .json({ message: "Error processing invites. Please try again." });
+        }
+      }
+
+      return res
+        .status(200)
+        .json({ message: "Invite emails sent successfully." });
     }
-  } catch (error) {}
+  } catch (error) {
+    console.error("Error in createGroup controller:", error.message);
+    return res.status(500).json({ message: "Internal server error." });
+  }
 };
 
 // TODO: add option to check if user is signed in or not (redirect to register/login if nots)
