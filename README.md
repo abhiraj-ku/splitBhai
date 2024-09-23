@@ -7,7 +7,6 @@
 </div>
 
 <div align="center">
-  <img src="https://img.shields.io/badge/Tech_Stack-Node.js%2FExpress%2C%20MongoDB%2C%20Redis%2C%20JWT%2C%20AWS%2C%20Cron%20Jobs%2C%20WebSockets%2FFirebase-blue" alt="Tech Stack Badge" />
   <img src="https://img.shields.io/badge/Version-1.0.0-green" alt="Version Badge" />
   <img src="https://img.shields.io/badge/License-MIT-orange" alt="License Badge" />
   <img src="https://img.shields.io/badge/Type-Web%20Application-purple" alt="Type Badge" />
