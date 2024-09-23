@@ -58,9 +58,9 @@ splitBhai is a group expense management app that simplifies shared expenses, off
 
 - **Node.js/Express**: Backend framework.
 - **MongoDB**: Database for user, group, and expense data.
-- **Redis**: Caching, OTP storage, real-time data.
+- **Redis**: Caching, OTP storage, Email sending Queue.
 - **JWT**: Authentication.
-- **Kafka**: Messaging queue for notifications.
+- **AWS**: Deployment , storage and monitoring application health
 - **Cron Jobs**: Automated tasks.
 - **WebSockets/Firebase**: Real-time communication.
 

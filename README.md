@@ -1,4 +1,35 @@
-# splitBhai - Group Expense Simplified
+<h1 align="center">
+  ✨ Welcome to SplitBhai ✨
+</h1>
+
+<div align="center">
+  <img src="/public/splitBhai_logo.jpeg" alt="splitBhai Logo" width="200px" height="200px" />
+</div>
+
+<div align="center">
+  <img src="https://img.shields.io/badge/Tech_Stack-Node.js%2FExpress%2C%20MongoDB%2C%20Redis%2C%20JWT%2C%20AWS%2C%20Cron%20Jobs%2C%20WebSockets%2FFirebase-blue" alt="Tech Stack Badge" />
+  <img src="https://img.shields.io/badge/Version-1.0.0-green" alt="Version Badge" />
+  <img src="https://img.shields.io/badge/License-MIT-orange" alt="License Badge" />
+  <img src="https://img.shields.io/badge/Type-Web%20Application-purple" alt="Type Badge" />
+  <img src="https://img.shields.io/badge/For-Group%20Expense%20Management-color" alt="Target Audience Badge" />
+</div>
+
+<br />
+
+## Tech Stack
+
+<div align="center">
+  <img src="https://img.shields.io/badge/Node.js-%2333cc33.svg?&style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js Badge" />
+  <img src="https://img.shields.io/badge/Express-%23404d59.svg?&style=for-the-badge&logo=express&logoColor=white" alt="Express Badge" />
+  <img src="https://img.shields.io/badge/MongoDB-%2347A248.svg?&style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB Badge" />
+  <img src="https://img.shields.io/badge/Redis-%23D52B1E.svg?&style=for-the-badge&logo=redis&logoColor=white" alt="Redis Badge" />
+  <img src="https://img.shields.io/badge/JWT-%23F7A3A3.svg?&style=for-the-badge&logo=json-web-tokens&logoColor=white" alt="JWT Badge" />
+  <img src="https://img.shields.io/badge/AWS-%23FF9900.svg?&style=for-the-badge&logo=amazonaws&logoColor=white" alt="AWS Badge" />
+  <img src="https://img.shields.io/badge/Cron%20Jobs-%23E8E8E8.svg?&style=for-the-badge&logo=cron&logoColor=black" alt="Cron Jobs Badge" />
+  <img src="https://img.shields.io/badge/WebSockets%2FFirebase-%23FFCA28.svg?&style=for-the-badge&logo=firebase&logoColor=black" alt="WebSockets/Firebase Badge" />
+</div>
+
+## About SplitBhai
 
 splitBhai is a smart group expense management platform designed to make shared expenses, event planning, and settling debts within groups easy and fun. Whether it's for a trip, a dinner with friends, or managing household finances, splitBhai helps keep track of what everyone owes, gives financial insights, and even provides creative ways to settle debts without using money.
 
