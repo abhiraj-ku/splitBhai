@@ -106,10 +106,8 @@ module.exports.joinGroup = async (req, res) => {
     }
     // Find group by name and code
     const group = await groupModel.findOne({
-      $where: {
-        groupName: groupName,
-        groupCode: groupCode,
-      },
+      groupName: groupName.trim(),
+      _id: groupCode,
     });
 
     if (!group) {

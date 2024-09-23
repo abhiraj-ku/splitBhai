@@ -36,6 +36,10 @@ const groupSchema = new mongoose.Schema({
       ref: "Event",
     },
   ],
+  maxBarterAmount: {
+    type: Number,
+    default: 0,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

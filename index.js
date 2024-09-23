@@ -4,6 +4,10 @@ const app = express();
 const PORT = process.env.PORT;
 const cookieParser = require("cookie-parser");
 const monogoSanitize = require("express-mongo-sanitize");
+const {
+  pollEmailQueue,
+  pollInviteQueue,
+} = require("./src/services/emailQueueProcessor");
 
 const connectDB = require("./src/db/db");
 
@@ -35,6 +39,10 @@ const userRoute = require("./src/routes/userRoute");
 
 // user route middleware
 app.use("/user/new", userRoute);
+
+// poll redis queues
+pollEmailQueue();
+pollInviteQueue();
 
 const server = app.listen(PORT, () => {
   console.log(`server is running on the port: ${PORT}`);
