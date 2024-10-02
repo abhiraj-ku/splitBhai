@@ -5,3 +5,9 @@
 
 #ignore specific file
 src/utils/constants.js
+
+*.vscode
+
+build
+dist
+.npm

@@ -40,7 +40,7 @@ async function storeuser(name, email) {
     await setAsync(email, userData);
 
     const ttl = process.env.REDIS_TTL || 300;
-    await expireAsync(email, 120);
+    await expireAsync(email, 300);
 
     console.log(`User details saved to redis for ${ttl} seconds `);
   } catch (error) {

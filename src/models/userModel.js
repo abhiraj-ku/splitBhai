@@ -43,7 +43,7 @@ const userSchema = new mongoose.Schema({
       ref: "Event",
     },
   ],
-  rislApetite: {
+  riskApetite: {
     type: Number,
     required: true,
     min: 0,

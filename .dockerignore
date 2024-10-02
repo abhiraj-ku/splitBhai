@@ -1,1 +1,8 @@
 node_modules
+*.git
+dist
+build
+package-lock.json
+.npm
+*.vscode
+*.tmp
