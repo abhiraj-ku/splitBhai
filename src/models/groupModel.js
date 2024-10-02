@@ -38,7 +38,8 @@ const groupSchema = new mongoose.Schema({
   ],
   maxBarterAmount: {
     type: Number,
-    default: 0,
+    min: 0,
+    required: true,
   },
   createdAt: {
     type: Date,

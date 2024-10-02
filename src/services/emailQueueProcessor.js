@@ -2,6 +2,7 @@ const { promisify } = require("util");
 const redisClient = require("./redisServer");
 const nodemailer = require("nodemailer");
 const { json } = require("stream/consumers");
+const cron = require("node-cron");
 
 // Using promisify to convert the callback based to promise chains
 const rpushAsync = promisify(redisClient.rPush).bind(redisClient);
@@ -79,13 +80,27 @@ async function processRetryQueue(retryQueueName, mainQueueName) {
   }
 }
 
-// Periodic queue polling function
-function pollQueues(mainQueueName, retryQueueName, dlqName) {
-  setInterval(() => processQueue(mainQueueName, retryQueueName, dlqName), 1000);
-  setInterval(() => processRetryQueue(retryQueueName, mainQueueName), 1000);
+// Run cron jobs to poll the queue at specific time
+// in this case we will poll the main queue at 12 am
+// night and retry queue 2-3 hours later
+function pollQueues(mainQueueName, retry_queue, dlqName) {
+  // Run the job at night(12 AM ) for main queue
+  cron.schedule("0 2 * * *", () => {
+    console.log(`Processing main queue at night...12 AM`);
+    processQueue(mainQueueName, retry_queue, dlqName);
+  });
+
+  // Run the job at night(2 AM ) for retry queue
+  cron.schedule("0 2 * * *", () => {
+    console.log(`Processing retry queue at night...2 AM`);
+    processRetryQueue(retry_queue, dlqName);
+  });
 }
+
 module.exports = {
   pollEmailQueue: () => pollQueues("email_queue", "retry_queue", "email_dlq"),
   pollInviteQueue: () =>
     pollQueues("invite_queue", "retry_invite_queue", "invite_dlq"),
+  pollBarterNotification: () =>
+    pollQueues("barter_notification", "retry_queue", "email_dlq"),
 };

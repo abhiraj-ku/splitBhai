@@ -32,7 +32,22 @@ async function queueInviteEmailSending(mailOptions) {
   }
 }
 
+async function queueBarterNotification(mailOptions) {
+  const job = json.stringify({
+    mailOptions,
+    retries: 0,
+  });
+  try {
+    await rpushAsync("barter_notification", job);
+    console.log(`Barter invite emails addded to queue`);
+  } catch (error) {
+    console.error(`Error adding emails to barter_notification queue`);
+    throw new Error(`Error adding emails to barter_notification queue`);
+  }
+}
+
 module.exports = {
   queueEmailSending,
   queueInviteEmailSending,
+  queueBarterNotification,
 };

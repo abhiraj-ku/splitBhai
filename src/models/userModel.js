@@ -43,6 +43,11 @@ const userSchema = new mongoose.Schema({
       ref: "Event",
     },
   ],
+  rislApetite: {
+    type: Number,
+    required: true,
+    min: 0,
+  },
   preferences: {
     notifications: {
       type: Boolean,
