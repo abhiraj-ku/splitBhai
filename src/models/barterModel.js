@@ -1,21 +1,21 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const barterPaymentsSchema = new Schema(
   {
     debtor: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       required: true,
     },
     creditor: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       required: true,
     },
     groupId: {
       type: Schema.Types.ObjectId,
-      ref: "Group",
+      ref: 'Group',
       required: true,
     },
     amount: {
@@ -29,24 +29,22 @@ const barterPaymentsSchema = new Schema(
     },
     status: {
       type: String,
-      enum: ["pending", "approved", "rejected"],
-      default: "pending",
+      enum: ['pending', 'approved', 'rejected'],
+      default: 'pending',
     },
-    settlementDate: {
-      type: Date,
-    },
+    settlementdate: { type: Date, default: Date.now },
   },
   { timestamps: true }
 );
 
 // setBarter date
-barterPaymentsSchema.pre("save", function (next) {
-  if (this.status == "approved" && !this.settlementDate) {
+barterPaymentsSchema.pre('save', function (next) {
+  if (this.status == 'approved' && !this.settlementDate) {
     this.settlementDate = Date.now();
   }
   next();
 });
 
-const BarterPayment = mongoose.model("BarterPayment", barterPaymentsSchema);
+const BarterPayment = mongoose.model('BarterPayment', barterPaymentsSchema);
 
 module.exports = BarterPayment;

@@ -11,3 +11,7 @@ src/utils/constants.js
 build
 dist
 .npm
+
+
+#misc
+prettierrcconf.txt

@@ -259,12 +259,6 @@ exports.resendVerificationEmail = async (req, res) => {
   }
 };
 
-// TODO: Implement the forgot password route
-
-// TODO: Implement the update password route
-
-// TODO: Implement the reset token route
-
 // Take user's choice to create group or join group
 
 module.exports.handleUserChoice = async (req, res) => {
@@ -302,3 +296,9 @@ module.exports.handleUserChoice = async (req, res) => {
     });
   }
 };
+
+// TODO: Implement the forgot password route
+
+// TODO: Implement the update password route
+
+// TODO: Implement the reset token route

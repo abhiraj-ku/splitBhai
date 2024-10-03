@@ -9,7 +9,7 @@
 <div align="center">
   <img src="https://img.shields.io/badge/Version-1.0.0-green" alt="Version Badge" />
   <img src="https://img.shields.io/badge/License-MIT-orange" alt="License Badge" />
-  <img src="https://img.shields.io/badge/Type-Web%20Application-purple" alt="Type Badge" />
+  <img src="https://img.shields.io/badge/Type-Mobile%20Application-purple" alt="Type Badge" />
   <img src="https://img.shields.io/badge/For-Group%20Expense%20Management-color" alt="Target Audience Badge" />
 </div>
 
