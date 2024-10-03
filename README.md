@@ -68,3 +68,7 @@ Stay updated with reminders and alerts for upcoming payments, event activities, 
 ## Developer Documentation
 
 For developers interested in learning more about splitBhai, visit the project documentation: [splitBhai Developer Docs](https://github.com/abhiraj-ku/splitBhai/blob/main/docs/Project.md)
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=abhiraj-ku/splitBhai&type=Date)](https://star-history.com/#abhiraj-ku/splitBhai&Date)
