@@ -27,11 +27,14 @@ const validateBarterPayInput = require('../helpers/validateBarterPay');
 const queueBarterNotification = require('../services/emailQueueProducer');
 
 // Redis functional imports
-const redisClient = require('./redisServer');
 const BarterPayment = require('../models/barterModel');
+const mailOptions = require('../utils/mailOptions');
+
+const redisClient = require('./redisServer');
 const setAsync = promisify(redisClient.set).bind(redisClient);
 const expireAsync = promisify(redisClient.expire).bind(redisClient);
 const getAsync = promisify(redisClient.get).bind(redisClient);
+const delAsync = promisify(redisClient.del).bind(redisClient);
 
 async function tempUserDataRedis(barterId, debtorId, creditorId, groupId, amount, barterType) {
   try {
@@ -59,10 +62,10 @@ async function tempUserDataRedis(barterId, debtorId, creditorId, groupId, amount
 // Debtor route
 // Debtor initiates the barter option
 module.exports.initiateBarterPayment = async (req, res) => {
-  const { debtorId, groupId, amount, barterType } = req.body;
-  const creditorId = req.user._id; // the person to whom payment is made
+  const { creditorId, groupId, amount, barterType } = req.body;
+  const debtorId = req.user._id; // the person initiating the payment (debtor)
 
-  // Custom validation function to valid input data -> helper/validateBarterPay.js
+  // Custom validation function to validate input data -> helper/validateBarterPay.js
   const validationErrors = validateBarterPayInput(
     debtorId,
     creditorId,
@@ -71,12 +74,12 @@ module.exports.initiateBarterPayment = async (req, res) => {
     barterType
   );
 
-  if (validateInput.size > 0) {
-    return res.status(400).json({ message: 'Valiation error in bPay', error: validationErrors });
+  if (validationErrors.size > 0) {
+    return res.status(400).json({ message: 'Validation error in bPay', error: validationErrors });
   }
   try {
     if (amount > req.user.riskApetite) {
-      return res.status(400).json({ message: 'Barter amount exceeds your risk apetite' });
+      return res.status(400).json({ message: 'Barter amount exceeds your risk appetite' });
     }
 
     // Fetch group and creditor from the database
@@ -96,24 +99,38 @@ module.exports.initiateBarterPayment = async (req, res) => {
         message: "Amount exceeds group's barter cap.",
       });
     }
-
     // Unique id for each barter payment
     const barterId = uuidv4();
 
+    // save the initial barter request
+    const barterRequest = await BarterPayment.create({
+      barterId, // Store the UUID
+      debtorId,
+      creditorId,
+      groupId,
+      amount,
+      barterType,
+      agreementStatus: 'none',
+      status: 'pending',
+    });
+    await barterRequest.save();
+
+    // Store temp data to redis also
     await tempUserDataRedis(barterId, debtorId, creditorId, groupId, amount, barterType);
 
     // Mail the creditor to approve the payment
-    const mailOptions = {
+    const mailOptionsData = mailOptions({
       from: `"SplitBhai Team" <backend.team@splitbhai.com>`,
-      to: creditor.email,
+      to: creditor,
       subject: 'New Barter Request',
       text: `You have a new barter request from ${req.user.name} for ${amount}. Barter Type: ${barterType}`,
-    };
-    await queueBarterNotification(mailOptions);
+    });
+    await queueBarterNotification(mailOptionsData);
 
-    res.status(201).json({ message: 'Barter request initiated successfully.' });
+    res.status(201).json({ message: 'Barter request initiated successfully.', barterId });
   } catch (error) {
-    res.status(500).json({ message: 'Server error.', error: err.message });
+    console.error('Error initiating barter payment:', error);
+    res.status(500).json({ message: 'Server error.', error: error.message });
   }
 };
 
@@ -126,36 +143,56 @@ module.exports.respBarter = async (req, res) => {
     const barterPaymentInfo = await getAsync(barterId);
 
     if (!barterPaymentInfo) {
-      res.status(400).json({
+      return res.status(400).json({
         message: 'The barter request has expired, Please ask the debtor to initiate payment again',
       });
     }
 
     // Parse the data from redis ttl
-    const { debtorId, groupId, amount, barterType } = JSON.parse(barterPaymentInfo);
+    const {
+      debtorId,
+      groupId,
+      amount,
+      barterType,
+      creditorId: storedCreditor,
+    } = JSON.parse(barterPaymentInfo);
 
     // check if the reposding creditor is the one whose id is stored in data
-    if (creditorId.toString() != creditorId) {
-      res.status(403).json({ message: 'You are not authorized creditor for this barter payment' });
+    if (creditorId.toString() != storedCreditor.toString()) {
+      return res
+        .status(403)
+        .json({ message: 'You are not authorized creditor for this barter payment' });
     }
 
-    // Check for status "approve" & "reject" one by one
-    if (status == 'approve') {
-      const barterPayment = await BarterPayment.create({
-        debtorId,
-        debtorId,
-        groupId,
-        amount,
-        barterType,
-        status: 'approved',
-      });
+    // delete barter request from redis
+    await delAsync(barterId);
 
-      await barterPayment.save();
+    // Check for status "creditor_approved" & "reject" one by one
+    if (status == 'approve') {
+      let barterRequest = await BarterPayment.findOne({ barterId });
+      if (!barterRequest) {
+        await BarterPayment.create({
+          debtorId,
+          debtorId,
+          groupId,
+          amount,
+          barterType,
+          agreementStatus: 'creditor_approved',
+          status: 'approved',
+        });
+      } else {
+        barterRequest.agreementStatus = 'creditor_approved';
+        await barterRequest.save();
+      }
+
+      // Delete from redis cache since it's updated into mongodb
+      await delAsync(barterId);
 
       return res
         .status(200)
-        .json({ message: 'Barter request approved successfully', barterPayment });
+        .json({ message: 'Barter request approved successfully', barterRequest });
     } else if (status == 'reject') {
+      await delAsync(barterRequest);
       return res.status(200).json({ message: 'Barter request declined' });
     } else {
       return res.status(400).json({

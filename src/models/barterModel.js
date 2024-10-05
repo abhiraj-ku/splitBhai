@@ -3,6 +3,10 @@ const { Schema } = mongoose;
 
 const barterPaymentsSchema = new Schema(
   {
+    barterId: {
+      type: String,
+      required: true,
+    },
     debtor: {
       type: Schema.Types.ObjectId,
       ref: 'User',
@@ -31,6 +35,11 @@ const barterPaymentsSchema = new Schema(
       type: String,
       enum: ['pending', 'approved', 'rejected'],
       default: 'pending',
+    },
+    agreementStatus: {
+      type: String,
+      enum: ['none', 'debtor_approved', 'creditor_approved', 'both_approved'],
+      default: 'none',
     },
     settlementdate: { type: Date, default: Date.now },
   },
