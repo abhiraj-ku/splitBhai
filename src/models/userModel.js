@@ -1,6 +1,6 @@
-const bcrypt = require("bcryptjs");
-const mongoose = require("mongoose");
-const jwt = require("jsonwebtoken");
+const bcrypt = require('bcryptjs');
+const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -31,16 +31,20 @@ const userSchema = new mongoose.Schema({
   avatar: {
     type: String, // URL to the user's profile picture
   },
+  valuePoints: {
+    type: Number,
+    default: 100,
+  },
   groups: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Group",
+      ref: 'Group',
     },
   ],
   events: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Event",
+      ref: 'Event',
     },
   ],
   riskApetite: {
@@ -55,7 +59,7 @@ const userSchema = new mongoose.Schema({
     },
     currency: {
       type: String,
-      default: "USD",
+      default: 'USD',
     },
   },
   badges: [
@@ -79,7 +83,7 @@ const userSchema = new mongoose.Schema({
 });
 
 // decrypt the password before saving using mongoose pre method
-userSchema.pre("save", async () => {
+userSchema.pre('save', async () => {
   if (!this.isModified) return;
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
@@ -97,7 +101,7 @@ userSchema.methods.comparePassword = async function (userPassword) {
 userSchema.methods.createJwtToken = function () {
   // Ensure `process.env.JWT_SECRET` is set correctly
   if (!process.env.JWT_SECRET) {
-    throw new Error("JWT_SECRET environment variable is not set.");
+    throw new Error('JWT_SECRET environment variable is not set.');
   }
 
   try {
@@ -105,12 +109,12 @@ userSchema.methods.createJwtToken = function () {
     return jwt.sign(
       { userId: this._id, email: this.email }, // Payload
       process.env.JWT_SECRET, // Secret key
-      { expiresIn: "1d" } // Token expiration
+      { expiresIn: '1d' } // Token expiration
     );
   } catch (error) {
-    console.error("Error generating JWT token:", error);
-    throw new Error("Error generating JWT token");
+    console.error('Error generating JWT token:', error);
+    throw new Error('Error generating JWT token');
   }
 };
 
-module.exports = mongoose.model("User", userSchema);
+module.exports = mongoose.model('User', userSchema);

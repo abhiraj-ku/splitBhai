@@ -14,7 +14,7 @@ How this Works?
 
 Note: This is completely an Experiment Feature
 */
-
+const fs = require('fs');
 const { promisify } = require('util');
 const { v4: uuidv4 } = require('uuid');
 
@@ -25,12 +25,14 @@ const groupModel = require('../models/groupModel');
 // Helpers and emails services
 const validateBarterPayInput = require('../helpers/validateBarterPay');
 const queueBarterNotification = require('../services/emailQueueProducer');
+const uploadMulter = require('../utils/multerConfig');
 
 // Redis functional imports
 const BarterPayment = require('../models/barterModel');
 const mailOptions = require('../utils/mailOptions');
 
 const redisClient = require('./redisServer');
+const uploadToS3 = require('../utils/uploadToS3');
 const setAsync = promisify(redisClient.set).bind(redisClient);
 const expireAsync = promisify(redisClient.expire).bind(redisClient);
 const getAsync = promisify(redisClient.get).bind(redisClient);
@@ -202,5 +204,81 @@ module.exports.respBarter = async (req, res) => {
   } catch (error) {
     console.log(`Error responsding to the barter request`, error);
     res.status(500).json({ message: 'Server error while responding to barter request.' });
+  }
+};
+
+//TODO: Barter POST /api/barter/settleProof
+module.exports.settlebarter = async (req, res) => {
+  const debtorId = req.user._id;
+  const { barterId } = req.body;
+
+  uploadMulter.single('evidence')(req, res, async function (err) {
+    if (err instanceof multer.MulterError) {
+      return res.status(400).json({ message: 'File upload error', error: err.message });
+    } else if (err) {
+      return res.status(400).json({ message: 'Unsupported file type', error: err.message });
+    }
+
+    if (!req.files) {
+      return res.status(400).json({ message: 'please upload evidences...' });
+    }
+
+    // get the filepath and name for uploading to s3
+    const evidencePath = req.file.path;
+    const filename = req.file.filename;
+
+    try {
+      const s3url = await uploadToS3(evidencePath, filename, debtorId);
+
+      // create a new settlement
+      const bSettlement = await BarterPayment.create({
+        barterId,
+        debtorId,
+        evidence: s3url,
+        votes: [],
+      });
+      await bSettlement.save();
+
+      fs.unlinkSync(evidencePath);
+
+      res.status(201).json({ message: 'Evidence uploade succesfully for review..' });
+    } catch (error) {
+      console.error(`Error settling barter request:`, error);
+      if (fs.existsSync(evidencePath)) {
+        fs.unlinkSync(evidencePath);
+      }
+      res.status(500).json({ message: 'Server error cannot upload files...' });
+    }
+  });
+};
+
+//TODO: Barter POST /api/barter/vote
+module.exports.voteOnBarter = async (req, res) => {
+  const { barterId } = req.params;
+  const vote = req.body;
+  const userId = req.user._id;
+
+  if (!['satisfactory', 'unsatisfactory'].includes(vote)) {
+    return res.status(400).json({ message: 'Invalid vote. Please provide among the two options' });
+  }
+  try {
+    const bsettlment = await BarterPayment.findOne({ barterId });
+    if (!bsettlment) {
+      return res.status(404).json({ message: 'Settment not found' });
+    }
+
+    // check if current user has already votes
+    const existingVote = bsettlment.votes.find((v) => v.userId.toString() === userId.toString());
+    if (existingVote) {
+      return res.status(400).json({ message: 'You have already voted on this barter request.' });
+    }
+
+    // add the user's votes
+    bsettlment.votes.push({ userId, vote });
+    await bsettlment.save();
+    return res.status(200).json({ message: 'Vote cast successfully.', barterRequest });
+  } catch (error) {
+    console.log(`Error while casting vote request`, error);
+    res.status(500).json({ message: 'Server error while voting on barter request.' });
   }
 };

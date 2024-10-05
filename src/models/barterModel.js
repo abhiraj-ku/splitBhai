@@ -1,6 +1,20 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
+// votes schema
+const voteSchema = new Schema({
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: User,
+    required: true,
+  },
+  vote: {
+    type: String,
+    enum: ['satisfactory', 'unsatisfactory'],
+    required: true,
+  },
+});
+
 const barterPaymentsSchema = new Schema(
   {
     barterId: {
@@ -41,6 +55,10 @@ const barterPaymentsSchema = new Schema(
       enum: ['none', 'debtor_approved', 'creditor_approved', 'both_approved'],
       default: 'none',
     },
+    evidence: {
+      type: String,
+    },
+    votes: [voteSchema],
     settlementdate: { type: Date, default: Date.now },
   },
   { timestamps: true }

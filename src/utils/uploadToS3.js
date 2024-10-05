@@ -1,6 +1,6 @@
-const { s3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
-const fs = require("fs");
-const path = require("path");
+const { s3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
+const fs = require('fs');
+const path = require('path');
 
 // Create a S3 client using aws sdk
 const s3Client = {
@@ -13,17 +13,17 @@ const s3Client = {
 
 // Upload to AWS S3 Bucket
 
-async function uploadToS3(filePath, fileName) {
+async function uploadToS3(filePath, fileName, userId) {
   try {
     // Read the file content
     const fileContent = fs.readFileSync(filePath);
 
     const s3Params = {
       Bucket: process.env.AWS_BUCKET_NAME,
-      Key: `profile-images/${fileName}`,
+      Key: `${userId}/profile-images/${fileName}`,
       Body: fileContent,
       ContentType: `images/jpg`,
-      ACL: "public-read",
+      ACL: 'public-read',
     };
 
     const command = new PutObjectCommand(s3Params);
@@ -34,7 +34,7 @@ async function uploadToS3(filePath, fileName) {
     // send url of uploaded images to frontend
     const s3ProfileImageUrl = `https://${process.env.AWS_S3_BUCKET_NAME}
     .s3.${process.env.AWS_REGION}
-    .amazonaws.com/profile-images/${fileName}`;
+    .amazonaws.com/${userId}/profile-images/${fileName}`;
 
     // Remove this file from local
     fs.unlinkSync(filePath);
