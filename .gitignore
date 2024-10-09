@@ -15,3 +15,6 @@ dist
 
 #misc
 prettierrcconf.txt
+
+app.log
+logger.js

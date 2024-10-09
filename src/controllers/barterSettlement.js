@@ -26,6 +26,7 @@ const groupModel = require('../models/groupModel');
 const validateBarterPayInput = require('../helpers/validateBarterPay');
 const queueBarterNotification = require('../services/emailQueueProducer');
 const uploadMulter = require('../utils/multerConfig');
+const logger = require('../../logger');
 
 // Redis functional imports
 const BarterPayment = require('../models/barterModel');
@@ -55,9 +56,9 @@ async function tempUserDataRedis(barterId, debtorId, creditorId, groupId, amount
     const deleteAfter = process.env.TEMP_DATA_STORE || 300;
     await expireAsync(debtorId, deleteAfter);
 
-    console.log(`Barter details saved to redis for ${deleteAfter} seconds `);
+    logger.info(`Barter details saved to redis for ${deleteAfter} seconds `);
   } catch (error) {
-    console.error(`Error while saving barter data to redis..`, error);
+    logger.error(`Error while saving barter data to redis..`, error);
   }
 }
 
@@ -131,7 +132,7 @@ module.exports.initiateBarterPayment = async (req, res) => {
 
     res.status(201).json({ message: 'Barter request initiated successfully.', barterId });
   } catch (error) {
-    console.error('Error initiating barter payment:', error);
+    logger.error('Error initiating barter payment:', error);
     res.status(500).json({ message: 'Server error.', error: error.message });
   }
 };
@@ -202,7 +203,7 @@ module.exports.respBarter = async (req, res) => {
       });
     }
   } catch (error) {
-    console.log(`Error responsding to the barter request`, error);
+    logger.info(`Error responsding to the barter request`, error);
     res.status(500).json({ message: 'Server error while responding to barter request.' });
   }
 };
@@ -243,7 +244,7 @@ module.exports.settlebarter = async (req, res) => {
 
       res.status(201).json({ message: 'Evidence uploade succesfully for review..' });
     } catch (error) {
-      console.error(`Error settling barter request:`, error);
+      logger.error(`Error settling barter request:`, error);
       if (fs.existsSync(evidencePath)) {
         fs.unlinkSync(evidencePath);
       }
@@ -278,7 +279,7 @@ module.exports.voteOnBarter = async (req, res) => {
     await bsettlment.save();
     return res.status(200).json({ message: 'Vote cast successfully.', barterRequest });
   } catch (error) {
-    console.log(`Error while casting vote request`, error);
+    logger.error(`Error while casting vote request`, error);
     res.status(500).json({ message: 'Server error while voting on barter request.' });
   }
 };
