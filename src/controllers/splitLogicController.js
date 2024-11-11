@@ -1,7 +1,6 @@
 const validateBillSplit = require('../helpers/validateBillsplitInputs');
 
 module.exports.splitBill = async (req, res) => {
-  // Step 1. Get the bare split equal done
   const {
     description,
     amount,
@@ -11,7 +10,8 @@ module.exports.splitBill = async (req, res) => {
     customAmounts,
     isPaidByIncluded,
   } = req.body;
-  if (!description || !amount || !paidBy || !splitType || !selectedMemeber) {
+
+  if (!description || !amount || !paidBy || !splitType || !selectedMembers) {
     return res.status(400).json({ message: 'All fields are required' });
   }
 
@@ -81,11 +81,70 @@ const splitEqual = (amount, paidBy, selectedMembers, isPaidByIncluded) => {
 // participating members can have different payments
 // amount to be paid.
 
-const custom = (amount, paidBy, selectedMembers, customAmounts, isPaidByIncluded) => {
+const splitCustom = (amount, paidBy, selectedMembers, customAmounts, isPaidByIncluded) => {
   let membersIndex = [...selectedMembers];
 
   // If paidBy should be included and isn't already in the array
   if (isPaidByIncluded && !membersIndex.includes(paidBy)) {
     membersIndex.push(paidBy);
+  }
+
+  try {
+    // validate the amount with customAmounts so that they
+    // match with amount (should not exceed total amount or be less than total amount)
+
+    const totalCustomAmount = Object.values(customAmounts).reduce(
+      (sum, value) => sum + parseInt(value),
+      0
+    );
+
+    if (totalCustomAmount < amount) {
+      const amountShort = amount - totalCustomAmount;
+      throw new Error(
+        `Custom amounts do not fully match the total amount. Shortfall of ${amountShort} remains`
+      );
+    } else if (Math.abs(totalCustomAmount > amount)) {
+      throw new Error(
+        `The sum of custom amounts (${totalCustomAmount}) does not match the total amount (${amount}).`
+      );
+    }
+
+    // Get each members money they owe from customAmounts object
+    const payments = membersIndex.map((member) => {
+      const thismemeberOwes = customAmounts[member] ? parseFloat(customAmounts[member]) : 0;
+
+      // if member == paidBy & paidBy is also part of transaction reduce his spendings and
+      // that is his whole reimbursement he is supposed to Get
+      // example:
+      /*
+        Assuming amount = 100, paidBy = '1', customAmounts = { '1': 10,'2': 40, '3': 50 }, 
+        and isPaidByIncluded = true:
+        so paidBy total reimbursement = amount - thismemeberOwes (paidBy in this case) 
+        100 -10 =90 he is supposed to get
+      
+      */
+      if (member === paidBy) {
+        return {
+          member,
+          owes: thismemeberOwes.toFixed(2),
+          description: `Paid Rs. ${amount} and will get ${amount - memberOwes} back`,
+        };
+      } else {
+        return {
+          member,
+          owes: thismemeberOwes.toFixed(2),
+          description: `Owes Rs. ${thismemeberOwes} to ${paidBy}`,
+        };
+      }
+    });
+    return {
+      splitType: 'custom',
+      totalAmount: amount,
+      paidBy,
+      selectedMembers: membersIndex,
+      payments,
+    };
+  } catch (error) {
+    throw new Error(`Failed to process custom bill split : ${error.message}`);
   }
 };
