@@ -1,7 +1,7 @@
 // custom mail options based on the params passed for different use cases
 // separation of concerns
 
-function mailOptions({ from, to, subject, text }) {
+function validateMailOptions({ from, to, subject, text }) {
   const defaultFrom = 'noreply@splitbhai.com';
   if (!from || typeof from !== 'string') {
     from = defaultFrom;
@@ -26,4 +26,4 @@ function mailOptions({ from, to, subject, text }) {
   };
 }
 
-module.exports = mailOptions;
+module.exports = validateMailOptions;

@@ -125,6 +125,7 @@ const splitCustom = (amount, paidBy, selectedMembers, customAmounts, isPaidByInc
       */
       if (member === paidBy) {
         return {
+          Recieves: true,
           member,
           owes: thismemeberOwes.toFixed(2),
           description: `Paid Rs. ${amount} and will get ${amount - memberOwes} back`,
