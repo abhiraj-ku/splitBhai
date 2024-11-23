@@ -180,7 +180,7 @@ module.exports.joinGroup = async (req, res) => {
         if (err) {
           reject(err);
         } else {
-          res(data);
+          resolve(data);
         }
       });
     });
