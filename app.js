@@ -1,12 +1,14 @@
-const express = require("express");
-const cookieParser = require("cookie-parser");
-const monogoSanitize = require("express-mongo-sanitize");
-const morgan = require("morgan");
-const connectDB = require("./src/db/db");
+const express = require('express');
+const cookieParser = require('cookie-parser');
+const monogoSanitize = require('express-mongo-sanitize');
+const morgan = require('morgan');
+const connectDB = require('./src/db/db');
 
 // App logic based routes
-const userRoute = require("./src/routes/userRoute");
-const groupRoute = require("./src/routes/groupRoute");
+const userRoute = require('./src/routes/userRoute');
+const groupRoute = require('./src/routes/groupRoute');
+const journalRoute = require('./src/routes/journalRoutes');
+const handlePaymentRoute = require('./src/routes/journalRoutes');
 
 // Initialize the app
 const app = express();
@@ -23,19 +25,27 @@ app.use(monogoSanitize());
 app.use(cookieParser());
 
 // HTTP request logger middleware
-app.use(morgan("tiny"));
+app.use(morgan('tiny'));
 
 // Sample route to test the server
-app.get("/home", (req, res) => {
+app.get('/home', (req, res) => {
   res.status(200).json({
-    message: "hello visitor!",
+    message: 'hello visitor!',
   });
 });
 
 // User route middleware
-app.use("/user/new", userRoute);
+app.use('api/v1/user/new', userRoute);
 
 // Group create and join route middleware
-app.use("/handle/g", groupRoute);
+app.use('api/v1/handle/gcreate', groupRoute);
+
+// expense journal routes and middlewares
+
+app.use('api/v1/expenses', journalRoute);
+
+// payments routes for settlements
+
+app.use('api/v1/pay', handlePaymentRoute);
 
 module.exports = app;
