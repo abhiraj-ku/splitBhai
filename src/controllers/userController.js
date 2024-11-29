@@ -286,3 +286,15 @@ module.exports.handleUserChoice = async (req, res) => {
 // TODO: Implement the update password route
 
 // TODO: Implement the reset token route
+
+exports.getAllMembers = handleAsync(async (req, res, next) => {
+  const members = await User.find();
+  res.status(200).json({ status: 'success', results: members.length, data: { members } });
+});
+
+exports.getMember = handleAsync(async (req, res, next) => {
+  const member = await User.findById(req.params.id);
+  if (!member) return res.status(404).json({ status: 'fail', message: 'Member not found' });
+
+  res.status(200).json({ status: 'success', data: { member } });
+});

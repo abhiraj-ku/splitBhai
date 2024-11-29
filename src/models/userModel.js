@@ -2,85 +2,92 @@ const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 
-const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    lowercase: true,
-    trim: true,
-  },
-  emailVerified: {
-    type: Boolean,
-    default: false,
-  },
-  password: {
-    type: String,
-    required: true,
-  },
-  phone: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  avatar: {
-    type: String, // URL to the user's profile picture
-  },
-  valuePoints: {
-    type: Number,
-    default: 100,
-  },
-  groups: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Group',
-    },
-  ],
-  events: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Event',
-    },
-  ],
-  riskApetite: {
-    type: Number,
-    required: true,
-    min: 0,
-  },
-  preferences: {
-    notifications: {
-      type: Boolean,
-      default: true,
-    },
-    currency: {
+const userSchema = new mongoose.Schema(
+  {
+    name: {
       type: String,
-      default: 'USD',
+      required: true,
+      trim: true,
     },
-  },
-  badges: [
-    {
+    email: {
       type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
     },
-  ],
-  totp: {
-    secret: {
-      type: String,
-    },
-    enabled: {
+    emailVerified: {
       type: Boolean,
       default: false,
     },
+    password: {
+      type: String,
+      required: true,
+    },
+    phone: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    avatar: {
+      type: String, // URL to the user's profile picture
+    },
+    valuePoints: {
+      type: Number,
+      default: 100,
+    },
+    groups: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Group',
+      },
+    ],
+    events: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Event',
+      },
+    ],
+    balance: {
+      type: Number,
+      required: true,
+    },
+    riskApetite: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+    preferences: {
+      notifications: {
+        type: Boolean,
+        default: true,
+      },
+      currency: {
+        type: String,
+        default: 'USD',
+      },
+    },
+    badges: [
+      {
+        type: String,
+      },
+    ],
+    totp: {
+      secret: {
+        type: String,
+      },
+      enabled: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
   },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
+  { timestamps: true }
+);
 
 // decrypt the password before saving using mongoose pre method
 userSchema.pre('save', async () => {

@@ -9,6 +9,7 @@ const userRoute = require('./src/routes/userRoute');
 const groupRoute = require('./src/routes/groupRoute');
 const journalRoute = require('./src/routes/journalRoutes');
 const handlePaymentRoute = require('./src/routes/journalRoutes');
+const settlementRoutes = require('./src/settlements/setRoutes/settleRoute');
 
 // Initialize the app
 const app = express();
@@ -47,5 +48,8 @@ app.use('api/v1/expenses', journalRoute);
 // payments routes for settlements
 
 app.use('api/v1/pay', handlePaymentRoute);
+
+// setllemtn route
+app.use('/api/v1/settlements', settlementRoutes);
 
 module.exports = app;
