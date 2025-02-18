@@ -24,6 +24,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+
     phone: {
       type: String,
       required: true,
@@ -89,6 +90,28 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Password reset schema
+const resetTokenSchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'userSchema',
+  },
+  token: {
+    type: String,
+    required: true,
+  },
+  expiresAt: {
+    type: Date,
+    required: true,
+    default: Date.now() * 15 * 60 * 1000,
+  },
+  used: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
+});
+
 // decrypt the password before saving using mongoose pre method
 userSchema.pre('save', async () => {
   if (!this.isModified) return;
@@ -124,4 +147,5 @@ userSchema.methods.createJwtToken = function () {
   }
 };
 
+module.exports = mongoose.model('ResetToken', resetTokenSchema);
 module.exports = mongoose.model('User', userSchema);

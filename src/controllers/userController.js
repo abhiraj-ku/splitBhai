@@ -280,8 +280,26 @@ module.exports.handleUserChoice = async (req, res) => {
     });
   }
 };
+s;
 
 // TODO: Implement the forgot password route
+
+exports.resetPassword = async (req, res) => {
+  // User clicks on 'forgot password' button
+  // they are redirected to the page to enter their email address
+  // Now verify that this user exists or not
+  // if yes send them a link with reset token url when they click on that a new page opens
+  // to update the password , before that check if the token is expired or not , or is valid token or not
+
+  // * for sending email , service layer will do the work this handler should do http related work
+
+  // Get User's email address from query
+  const { email } = req.body;
+  if (!email)
+    return res.status(400).json({
+      message: 'Please provide an email in input below',
+    });
+};
 
 // TODO: Implement the update password route
 
